@@ -1,0 +1,39 @@
+import React from "react";
+import KanbanColumn from "./KanbanColumn";
+import { groupTickets, sortTickets } from "../utils/utils";
+
+const KanbanBoard = ({ data, groupBy, sortBy }) => {
+  const { tickets, users } = data;
+  console.log()
+
+  // Group tickets based on the selected grouping criteria
+  const groupedTickets = groupTickets(tickets, groupBy);
+
+  // Sort tickets within each group
+  const sortedGroupedTickets = Object.keys(groupedTickets).reduce((acc, groupKey) => {
+    acc[groupKey] = sortTickets(groupedTickets[groupKey], sortBy);
+    return acc;
+  }, {});
+
+  return (
+    <div className="kanban-board">
+      {Object.keys(sortedGroupedTickets).map((group) => {
+        // If grouping by "user", replace group key with the user's name
+        const title =
+          groupBy === "user" && users[group]
+            ? users[group].name // Use `data.users` to map group key (userId) to user name
+            : group;
+
+        return (
+          <KanbanColumn
+            key={group}
+            title={title}
+            tickets={sortedGroupedTickets[group]}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+export default KanbanBoard;
